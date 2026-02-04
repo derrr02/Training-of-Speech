@@ -65,7 +65,10 @@ def extract_features(audio_path, sample_rate=16000, duration=3, n_mfcc=40):
     mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=n_mfcc)
     
     # Normalize
-    mfcc = (mfcc - np.mean(mfcc)) / np.std(mfcc)
+    mfcc_mean = np.mean(mfcc)
+    mfcc_std = np.std(mfcc)
+    # Add epsilon to avoid division by zero for silent audio
+    mfcc = (mfcc - mfcc_mean) / (mfcc_std + 1e-8)
     
     # Add batch and channel dimensions
     mfcc = mfcc[np.newaxis, ..., np.newaxis]
