@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Model files
+*.h5
+*.keras
+*_labels.json
+
+# Data directories
+sample_data/
+data/
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
