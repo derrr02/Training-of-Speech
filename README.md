@@ -98,6 +98,7 @@ This framework can be used for various speech/audio tasks:
 - **Emotion Detection**: Detect emotions from speech
 - **Audio Classification**: Classify any type of audio data
 - **Language Identification**: Identify the language being spoken
+- **Translation Apps**: Detect source language for translation (see [TRANSLATION_APP_GUIDE.md](TRANSLATION_APP_GUIDE.md))
 
 ## Example: Training on Speech Commands
 
@@ -107,6 +108,21 @@ python train_speech_cnn.py \
     --data_dir ./speech_commands_data \
     --epochs 50 \
     --batch_size 32
+```
+
+## For Translation Apps
+
+If you're building a translation app and need to train a model for language detection, see our detailed guide:
+
+📖 **[Translation App Guide](TRANSLATION_APP_GUIDE.md)** - Complete tutorial for training speech models for translation
+
+Example integration:
+```bash
+# Train language detection model
+python train_speech_cnn.py --data_dir translation_data --model_save_path language_classifier.h5
+
+# Use in translation app
+python translation_app_example.py --audio_file speech.wav
 ```
 
 ## Requirements
