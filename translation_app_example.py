@@ -48,6 +48,30 @@ class LanguageDetector:
         print(f"Loaded model: {model_path}")
         print(f"Supported languages: {', '.join(self.languages)}")
     
+    def _extract_mfcc_from_audio(self, audio, sr):
+        """
+        Helper method to extract and normalize MFCC features from audio data
+        
+        Args:
+            audio: Audio data as numpy array
+            sr: Sample rate
+            
+        Returns:
+            Normalized MFCC features with batch and channel dimensions
+        """
+        # Extract MFCC
+        mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=self.n_mfcc)
+        
+        # Normalize
+        mfcc_mean = np.mean(mfcc)
+        mfcc_std = np.std(mfcc)
+        mfcc = (mfcc - mfcc_mean) / (mfcc_std + 1e-8)
+        
+        # Add batch and channel dimensions
+        mfcc = mfcc[np.newaxis, ..., np.newaxis]
+        
+        return mfcc
+    
     def extract_features(self, audio_path):
         """
         Extract MFCC features from audio file
@@ -67,18 +91,7 @@ class LanguageDetector:
         else:
             audio = audio[:self.max_len]
         
-        # Extract MFCC
-        mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=self.n_mfcc)
-        
-        # Normalize
-        mfcc_mean = np.mean(mfcc)
-        mfcc_std = np.std(mfcc)
-        mfcc = (mfcc - mfcc_mean) / (mfcc_std + 1e-8)
-        
-        # Add batch and channel dimensions
-        mfcc = mfcc[np.newaxis, ..., np.newaxis]
-        
-        return mfcc
+        return self._extract_mfcc_from_audio(audio, sr)
     
     def detect_language(self, audio_path, confidence_threshold=0.5):
         """
@@ -144,12 +157,8 @@ class LanguageDetector:
             if len(chunk) < chunk_size:
                 chunk = np.pad(chunk, (0, chunk_size - len(chunk)))
             
-            # Extract features
-            mfcc = librosa.feature.mfcc(y=chunk, sr=self.sample_rate, n_mfcc=self.n_mfcc)
-            mfcc_mean = np.mean(mfcc)
-            mfcc_std = np.std(mfcc)
-            mfcc = (mfcc - mfcc_mean) / (mfcc_std + 1e-8)
-            mfcc = mfcc[np.newaxis, ..., np.newaxis]
+            # Extract features using shared helper
+            mfcc = self._extract_mfcc_from_audio(chunk, self.sample_rate)
             
             # Predict
             predictions = self.model.predict(mfcc, verbose=0)[0]
@@ -290,7 +299,7 @@ def main():
     parser.add_argument(
         '--model_path',
         type=str,
-        default='speech_cnn_model.h5',
+        default='language_classifier.h5',
         help='Path to trained language detection model'
     )
     
